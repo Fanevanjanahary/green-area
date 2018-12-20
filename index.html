@@ -5,10 +5,7 @@
     <title>SIG Tarvel</title>
     <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.51.0/mapbox-gl.js'></script>
     <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.51.0/mapbox-gl.css' rel='stylesheet' />
-    <style>
-        body { margin:0; padding:0; }
-        #map { position:absolute; top:0; bottom:0; width:100%; }
-    </style>
+
 </head>
 <body>
 
@@ -16,7 +13,17 @@
   <div class='heading'>
     <h1>SIG Tarvel</h1>
   </div>
-  <div id='listings' class='listings'></div>
+    <div id='listings' class='listings'>
+        <div id='listings-0' class='item'>
+            <a class="title" href="#">Ponctuels</a>
+        </div>
+        <div id='listings-1' class='item'>
+            <a class="title"  href="#">Linéaires</a>
+        </div>
+         <div id='listings-2' class='item'>
+            <a class="title"  href="#">Surface</a>
+        </div>
+    </div>
 </div>
 
 
@@ -29,31 +36,59 @@ var map = new mapboxgl.Map({
     container: 'map',
     style: 'mapbox://styles/mapbox/streets-v9',
     center: [6.085527, 48.917120],
-    zoom: 5
+    zoom: 13
 });
 
-var stores = 'data/point.geojson';
+map.on("load", function() {
+    map.addSource("green-area-points", {
+        "type": "geojson",
+        "data": "data/point.geojson"
+    });
 
-map.on('load', function () {
+    map.addSource("green-area-lines", {
+        "type": "geojson",
+        "data": "data/line.geojson"
+    });
+
+     map.addSource("green-area-polygon", {
+        "type": "geojson",
+        "data": "data/polygon.geojson"
+    });
+
 
     map.addLayer({
-        'id': 'maine',
-        'type': 'fill',
-        'source': {
-            'type': 'geojson',
-            'data': stores
-        },
-        'layout': {}
-
+        "id": "points",
+        "type": "symbol",
+        "source": "green-area-points",
+        "layout": {
+          "icon-image": "park-15",
+          "icon-allow-overlap": true,
+    }
     });
+
+    map.addLayer({
+        "id": "lines",
+        "type": "line",
+        "source": "green-area-lines",
+        "paint": {
+            "line-color": "green",
+            "line-width": 5,
+            "line-opacity": .8
+        }
+    });
+
+    map.addLayer({
+        "id": "polygons",
+        "type": "line",
+        "source": "green-area-polygon",
+        "layout": {},
+    });
+
 });
-
-
-
 </script>
 
 <style>
-  body {
+ body {
   color: #404040;
   font: 400 15px/22px 'Source Sans Pro', 'Helvetica Neue', Sans-serif;
   margin: 0;
@@ -87,21 +122,16 @@ a:hover {
 .sidebar {
   position: absolute;
   width: 25%;
-  height: 100%;
   top: 0;
   left: 0;
   overflow: hidden;
   border-right: 1px solid rgba(0, 0, 0, 0.25);
 }
 
-.pad2 {
-  padding: 20px;
-}
-
 .map {
   position: absolute;
   left: 25%;
-  width: 66.6666%;
+  width: 75%;
   top: 0;
   bottom: 0;
 }
@@ -169,10 +199,6 @@ a:hover {
   clear: both;
   visibility: hidden;
 }
-
-
-
-
 </style>
 
 </body>
