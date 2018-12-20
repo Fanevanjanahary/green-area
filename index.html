@@ -3,9 +3,19 @@
 <head>
     <meta charset='utf-8' />
     <title>SIG Tarvel</title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
     <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.51.0/mapbox-gl.js'></script>
     <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.51.0/mapbox-gl.css' rel='stylesheet' />
-
+    <style>
+        body { margin:0; padding:0; }
+        #map { position:absolute; top:0; bottom:0; width:100%; left: 25%;}
+        #menu {
+            position: absolute;
+            background: #fff;
+            left: 25%;
+            font-family: 'Open Sans', sans-serif;
+        }
+    </style>
 </head>
 <body>
 
@@ -14,43 +24,35 @@
     <h1>SIG Tarvel</h1>
   </div>
     <div id='listings' class='listings'>
-        <div id='listings-0' class='item'>
-            <a class="title" href="#">Ponctuels</a>
-        </div>
-        <div id='listings-1' class='item'>
-            <a class="title"  href="#">Linéaires</a>
-        </div>
-         <div id='listings-2' class='item'>
-            <a class="title"  href="#">Surface</a>
-        </div>
     </div>
 </div>
 
 
 <div id='map' class='map'></div>
 
-
 <script>
 mapboxgl.accessToken = 'pk.eyJ1IjoiZmFuZXZhIiwiYSI6ImNqZGxhOW5rMDA0bnkzM3A4MmJldm8ydmQifQ.EKyPWlXVcZ6ZcP_5ve6GOQ';
+
 var map = new mapboxgl.Map({
     container: 'map',
-    style: 'mapbox://styles/mapbox/streets-v9',
+    style: 'mapbox://styles/mapbox/satellite-v9',
     center: [6.085527, 48.917120],
     zoom: 13
 });
 
 map.on("load", function() {
-    map.addSource("green-area-points", {
+
+    map.addSource("Ponctuels", {
         "type": "geojson",
         "data": "data/point.geojson"
     });
 
-    map.addSource("green-area-lines", {
+    map.addSource("Lineaires", {
         "type": "geojson",
         "data": "data/line.geojson"
     });
 
-     map.addSource("green-area-polygon", {
+     map.addSource("Surfaces", {
         "type": "geojson",
         "data": "data/polygon.geojson"
     });
@@ -59,8 +61,9 @@ map.on("load", function() {
     map.addLayer({
         "id": "points",
         "type": "symbol",
-        "source": "green-area-points",
+        "source": "Ponctuels",
         "layout": {
+          "visibility": "visible",
           "icon-image": "park-15",
           "icon-allow-overlap": true,
     }
@@ -69,25 +72,60 @@ map.on("load", function() {
     map.addLayer({
         "id": "lines",
         "type": "line",
-        "source": "green-area-lines",
+        "source": "Lineaires",
         "paint": {
             "line-color": "green",
             "line-width": 5,
             "line-opacity": .8
-        }
+        },
+        "layout": {
+            "visibility": "visible"
+        },
     });
 
     map.addLayer({
-        "id": "polygons",
+        "id": "Surfaces",
         "type": "line",
-        "source": "green-area-polygon",
-        "layout": {},
+        "source": "Surfaces",
+        "layout": {
+            "visibility": "visible"
+        },
     });
 
 });
+
+var toggleableLayerIds = ['Ponctuels', 'Lineaires', 'Surfaces'];
+for (i = 0; i < toggleableLayerIds.length; i++) {
+     var currentFeature = toggleableLayerIds[i];
+     var listings = document.getElementById('listings');
+     var listing = listings.appendChild(document.createElement('div'));
+     listing.className = 'item';
+     listing.id = 'listing-' + i;
+     var link = listing.appendChild(document.createElement('a'));
+     link.href = '#';
+     link.className = 'title';
+     link.dataPosition = i;
+     link.innerHTML = currentFeature;
+     link.onclick = function (e) {
+        var clickedLayer = this.textContent;
+        e.preventDefault();
+        e.stopPropagation();
+        var visibility = map.getLayoutProperty(clickedLayer, 'visibility');
+        if (visibility === 'visible') {
+            map.setLayoutProperty(clickedLayer, 'visibility', 'none');
+            this.className = '';
+        } else {
+            this.className = 'title';
+            map.setLayoutProperty(clickedLayer, 'visibility', 'visible');
+        }
+     };
+ };
+
 </script>
 
 <style>
+
+#map { position:absolute; top:0; bottom:0; width:75%; }
  body {
   color: #404040;
   font: 400 15px/22px 'Source Sans Pro', 'Helvetica Neue', Sans-serif;
@@ -126,14 +164,6 @@ a:hover {
   left: 0;
   overflow: hidden;
   border-right: 1px solid rgba(0, 0, 0, 0.25);
-}
-
-.map {
-  position: absolute;
-  left: 25%;
-  width: 75%;
-  top: 0;
-  bottom: 0;
 }
 
 .heading {
