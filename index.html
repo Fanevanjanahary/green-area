@@ -59,7 +59,7 @@ map.on("load", function() {
 
 
     map.addLayer({
-        "id": "points",
+        "id": "Ponctuels",
         "type": "symbol",
         "source": "Ponctuels",
         "layout": {
@@ -70,7 +70,7 @@ map.on("load", function() {
     });
 
     map.addLayer({
-        "id": "lines",
+        "id": "Lineaires",
         "type": "line",
         "source": "Lineaires",
         "paint": {
@@ -113,7 +113,7 @@ for (i = 0; i < toggleableLayerIds.length; i++) {
         var visibility = map.getLayoutProperty(clickedLayer, 'visibility');
         if (visibility === 'visible') {
             map.setLayoutProperty(clickedLayer, 'visibility', 'none');
-            this.className = '';
+            this.className = 'visible';
         } else {
             this.className = 'title';
             map.setLayoutProperty(clickedLayer, 'visibility', 'visible');
@@ -194,6 +194,13 @@ a:hover {
   color: #00853e;
   font-weight: 700;
 }
+
+.listings .item .visible {
+  display: block;
+  color: #046380e;
+  font-weight: 700;
+}
+
 
 .listings .item .title small { font-weight: 400; }
 
