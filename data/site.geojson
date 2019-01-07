@@ -1,0 +1,18 @@
+{
+"type": "FeatureCollection",
+"name": "site",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "id": 463558, "name": "STEP Aix Ouest" }, "geometry": { "type": "Point", "coordinates": [ 5.335531, 43.506042 ] } },
+{ "type": "Feature", "properties": { "id": 462890, "name": "Saint Anastasie" }, "geometry": { "type": "Point", "coordinates": [ 6.056406, 43.327533 ] } },
+{ "type": "Feature", "properties": { "id": 464069, "name": "Les Menils" }, "geometry": { "type": "Point", "coordinates": [ 6.084312, 48.919223 ] } },
+{ "type": "Feature", "properties": { "id": 466888, "name": "Tronville en Barrois" }, "geometry": { "type": "Point", "coordinates": [ 5.285213, 48.716491 ] } },
+{ "type": "Feature", "properties": { "id": 462490, "name": "Station de pompage La Pire" }, "geometry": { "type": "Point", "coordinates": [ 5.119042, 45.866429 ] } },
+{ "type": "Feature", "properties": { "id": 463819, "name": "Ciel ouvert Landes de Juzan" }, "geometry": { "type": "Point", "coordinates": [ -1.508508, 43.474755 ] } },
+{ "type": "Feature", "properties": { "id": 463584, "name": "Bassin Combalat" }, "geometry": { "type": "Point", "coordinates": [ 4.747904, 45.674519 ] } },
+{ "type": "Feature", "properties": { "id": 463563, "name": "Surpresseur Pusignan" }, "geometry": { "type": "Point", "coordinates": [ 5.081987, 45.760368 ] } },
+{ "type": "Feature", "properties": { "id": 464326, "name": "Flevy" }, "geometry": { "type": "Point", "coordinates": [ 6.2801, 49.2204 ] } },
+{ "type": "Feature", "properties": { "id": 465900, "name": "Eschwiller" }, "geometry": { "type": "Point", "coordinates": [ 7.130977, 48.855266 ] } }
+]
+}
+
