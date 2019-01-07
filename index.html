@@ -24,14 +24,44 @@
     <h1>SIG Tarvel</h1>
   </div>
     <div id='listings' class='listings'>
+         <div id='entities' class='entities'>
+        </div>
     </div>
+
 </div>
 
 
 <div id='map' class='map'></div>
 
 <script>
+
+if (!('remove' in Element.prototype)) {
+  Element.prototype.remove = function() {
+    if (this.parentNode) {
+      this.parentNode.removeChild(this);
+    }
+  };
+}
+
 mapboxgl.accessToken = 'pk.eyJ1IjoiZmFuZXZhIiwiYSI6ImNqZGxhOW5rMDA0bnkzM3A4MmJldm8ydmQifQ.EKyPWlXVcZ6ZcP_5ve6GOQ';
+
+var sites = {
+"type": "FeatureCollection",
+"name": "site",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "id": 463558, "name": "STEP Aix Ouest" }, "geometry": { "type": "Point", "coordinates": [ 5.335531, 43.506042 ] } },
+{ "type": "Feature", "properties": { "id": 462890, "name": "Saint Anastasie" }, "geometry": { "type": "Point", "coordinates": [ 6.056406, 43.327533 ] } },
+{ "type": "Feature", "properties": { "id": 464069, "name": "Les Menils" }, "geometry": { "type": "Point", "coordinates": [ 6.084312, 48.919223 ] } },
+{ "type": "Feature", "properties": { "id": 466888, "name": "Tronville en Barrois" }, "geometry": { "type": "Point", "coordinates": [ 5.285213, 48.716491 ] } },
+{ "type": "Feature", "properties": { "id": 462490, "name": "Station de pompage La Pire" }, "geometry": { "type": "Point", "coordinates": [ 5.119042, 45.866429 ] } },
+{ "type": "Feature", "properties": { "id": 463819, "name": "Ciel ouvert Landes de Juzan" }, "geometry": { "type": "Point", "coordinates": [ -1.508508, 43.474755 ] } },
+{ "type": "Feature", "properties": { "id": 463584, "name": "Bassin Combalat" }, "geometry": { "type": "Point", "coordinates": [ 4.747904, 45.674519 ] } },
+{ "type": "Feature", "properties": { "id": 463563, "name": "Surpresseur Pusignan" }, "geometry": { "type": "Point", "coordinates": [ 5.081987, 45.760368 ] } },
+{ "type": "Feature", "properties": { "id": 464326, "name": "Flevy" }, "geometry": { "type": "Point", "coordinates": [ 6.2801, 49.2204 ] } },
+{ "type": "Feature", "properties": { "id": 465900, "name": "Eschwiller" }, "geometry": { "type": "Point", "coordinates": [ 7.130977, 48.855266 ] } }
+]
+};
 
 var map = new mapboxgl.Map({
     container: 'map',
@@ -40,7 +70,12 @@ var map = new mapboxgl.Map({
     zoom: 13
 });
 
-map.on("load", function() {
+map.on("load", function(e) {
+
+    map.addSource("Sites", {
+        "type": "geojson",
+        "data": sites
+    });
 
     map.addSource("Ponctuels", {
         "type": "geojson",
@@ -57,6 +92,16 @@ map.on("load", function() {
         "data": "data/polygon.geojson"
     });
 
+    map.addLayer({
+        "id": "Sites",
+        "type": "symbol",
+        "source": "Sites",
+        "layout": {
+          "visibility": "visible",
+          "icon-image": "park-15",
+          "icon-allow-overlap": true,
+    }
+    });
 
     map.addLayer({
         "id": "Ponctuels",
@@ -92,16 +137,42 @@ map.on("load", function() {
         },
     });
 
+    buildLocationList(sites);
+    var features = map.queryRenderedFeatures(e.point, { layers: ['Sites'] });
+    if (features.length) {
+    var clickedPoint = features[0];
+    // 1. Fly to the point
+    flyToStore(clickedPoint);
+    // 2. Close all other popups and display popup for clicked store
+    createPopUp(clickedPoint);
+    // 3. Highlight listing in sidebar (and remove highlight for all other listings)
+    var activeItem = document.getElementsByClassName('active');
+    if (activeItem[0]) {
+      activeItem[0].classList.remove('active');
+    }
+    // Find the index of the store.features that corresponds to the clickedPoint that fired the event listener
+    var selectedFeature = clickedPoint.properties.address;
+
+    for (var i = 0; i < stores.features.length; i++) {
+      if (stores.features[i].properties.address === selectedFeature) {
+        selectedFeatureIndex = i;
+      }
+    }
+    // Select the correct list item using the found index and add the active class
+    var listing = document.getElementById('listing-' + selectedFeatureIndex);
+    listing.classList.add('active');
+  }
+
 });
 
 var toggleableLayerIds = ['Ponctuels', 'Lineaires', 'Surfaces'];
 for (i = 0; i < toggleableLayerIds.length; i++) {
      var currentFeature = toggleableLayerIds[i];
-     var listings = document.getElementById('listings');
-     var listing = listings.appendChild(document.createElement('div'));
-     listing.className = 'item';
-     listing.id = 'listing-' + i;
-     var link = listing.appendChild(document.createElement('a'));
+     var listings = document.getElementById('entities');
+     var entity = entities.appendChild(document.createElement('div'));
+     entity.className = 'item';
+     entity.id = 'entity-' + i;
+     var link = entity.appendChild(document.createElement('a'));
      link.href = '#';
      link.className = 'title';
      link.dataPosition = i;
@@ -120,6 +191,71 @@ for (i = 0; i < toggleableLayerIds.length; i++) {
         }
      };
  };
+
+function buildLocationList(data) {
+  // Iterate through the list of stores
+  for (i = 0; i < data.features.length; i++) {
+    var currentFeature = data.features[i];
+    // Shorten data.feature.properties to just `prop` so we're not
+    // writing this long form over and over again.
+    var prop = currentFeature.properties;
+    // Select the listing container in the HTML and append a div
+    // with the class 'item' for each store
+    var listings = document.getElementById('listings');
+    var listing = listings.appendChild(document.createElement('div'));
+    listing.className = 'item';
+    listing.id = 'listing-' + i;
+
+    // Create a new link with the class 'title' for each store
+    // and fill it with the store address
+    var link = listing.appendChild(document.createElement('a'));
+    link.href = '#';
+    link.className = 'title';
+    link.dataPosition = i;
+    link.innerHTML = prop.id;
+
+    // Create a new div with the class 'details' for each store
+    // and fill it with the city and phone number
+    var details = listing.appendChild(document.createElement('div'));
+    details.innerHTML = prop.name;
+
+    link.addEventListener('click', function(e) {
+      // Update the currentFeature to the store associated with the clicked link
+      var clickedListing = sites.features[this.dataPosition];
+      // 1. Fly to the point associated with the clicked link
+      flyToStore(clickedListing);
+      // 2. Close all other popups and display popup for clicked store
+      createPopUp(clickedListing);
+      // 3. Highlight listing in sidebar (and remove highlight for all other listings)
+      var activeItem = document.getElementsByClassName('active');
+      if (activeItem[0]) {
+        activeItem[0].classList.remove('active');
+      }
+      this.parentNode.classList.add('active');
+});
+
+
+  }
+};
+
+function flyToStore(currentFeature) {
+  map.flyTo({
+    center: currentFeature.geometry.coordinates,
+    zoom: 15
+  });
+}
+
+function createPopUp(currentFeature) {
+  var popUps = document.getElementsByClassName('mapboxgl-popup');
+  // Check if there is already a popup on the map and if so, remove it
+  if (popUps[0]) popUps[0].remove();
+
+  var popup = new mapboxgl.Popup({ closeOnClick: false })
+    .setLngLat(currentFeature.geometry.coordinates)
+    .setHTML('<h3>Site</h3>' +
+      '<h4>' + currentFeature.properties.name + '</h4>')
+    .addTo(map);
+}
 
 </script>
 
@@ -235,6 +371,55 @@ a:hover {
   height: 0;
   clear: both;
   visibility: hidden;
+}
+
+/* Marker tweaks */
+.mapboxgl-popup-close-button {
+  display: none;
+}
+
+.mapboxgl-popup-content {
+  font: 400 15px/22px 'Source Sans Pro', 'Helvetica Neue', Sans-serif;
+  padding: 0;
+  width: 180px;
+}
+
+.mapboxgl-popup-content-wrapper {
+  padding: 1%;
+}
+
+.mapboxgl-popup-content h3 {
+  background: #91c949;
+  color: #fff;
+  margin: 0;
+  display: block;
+  padding: 10px;
+  border-radius: 3px 3px 0 0;
+  font-weight: 700;
+  margin-top: -15px;
+}
+
+.mapboxgl-popup-content h4 {
+  margin: 0;
+  display: block;
+  padding: 10px;
+  font-weight: 400;
+}
+
+.mapboxgl-popup-content div {
+  padding: 10px;
+}
+
+.mapboxgl-container .leaflet-marker-icon {
+  cursor: pointer;
+}
+
+.mapboxgl-popup-anchor-top > .mapboxgl-popup-content {
+  margin-top: 15px;
+}
+
+.mapboxgl-popup-anchor-top > .mapboxgl-popup-tip {
+  border-bottom-color: #91c949;
 }
 </style>
 
