@@ -31,7 +31,6 @@
 </div>
 
 <div id='map' class='map'></div>
-
 <script>
 
 if (!('remove' in Element.prototype)) {
@@ -97,7 +96,6 @@ map.on("load", function(e) {
         "source": "Sites",
         "layout": {
           "visibility": "visible",
-          "icon-image": "park-15",
           "icon-allow-overlap": true,
     }
     });
@@ -163,6 +161,15 @@ map.on("load", function(e) {
   };
 
 });
+
+var layers = {
+      Streets: mapboxgl.tileLayer('mapbox.streets'),
+      Outdoors: mapboxgl.tileLayer('mapbox.outdoors'),
+      Satellite: mapboxgl.tileLayer('mapbox.satellite')
+};
+
+layers.Streets.addTo(map);
+mapboxgl.control.layers(layers).addTo(map);
 
 map.addControl(new mapboxgl.NavigationControl({
     showCompass: false
@@ -299,6 +306,7 @@ function createPopUp(currentFeature) {
       '<h6>' + currentFeature.properties.name + '</h6>')
     .addTo(map);
 }
+
 
 </script>
 
