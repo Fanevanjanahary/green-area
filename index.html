@@ -136,8 +136,7 @@ map.on("load", function(e) {
         },
     });
 
-    buildLocationList(sites);
-    addEntities(map);
+    buildLocationList(sites, map);
     var features = map.queryRenderedFeatures(e.point, { layers: ['Sites'] });
     if (features.length) {
     var clickedPoint = features[0];
@@ -177,36 +176,7 @@ map.addControl(new mapboxgl.GeolocateControl({
     trackUserLocation: true
 }));
 
-function addEntities(map) {
-    var toggleableLayerIds = ['Ponctuels', 'Lineaires', 'Surfaces'];
-    for (i = 0; i < toggleableLayerIds.length; i++) {
-         var currentFeature = toggleableLayerIds[i];
-         var listings = document.getElementById('entities');
-         var entity = entities.appendChild(document.createElement('div'));
-         entity.className = 'item';
-         entity.id = 'entity-' + i;
-         var link = entity.appendChild(document.createElement('a'));
-         link.href = '#';
-         link.className = 'title';
-         link.dataPosition = i;
-         link.innerHTML = currentFeature;
-         link.onclick = function (e) {
-            var clickedLayer = this.textContent;
-            e.preventDefault();
-            e.stopPropagation();
-            var visibility = map.getLayoutProperty(clickedLayer, 'visibility');
-            if (visibility === 'visible') {
-                map.setLayoutProperty(clickedLayer, 'visibility', 'none');
-                this.className = 'visible';
-            } else {
-                this.className = 'title';
-                map.setLayoutProperty(clickedLayer, 'visibility', 'visible');
-            }
-         };
-     }
- };
-
-function buildLocationList(data) {
+function buildLocationList(data, map) {
   // Iterate through the list of stores
   for (i = 0; i < data.features.length; i++) {
     var currentFeature = data.features[i];
@@ -252,7 +222,7 @@ function buildLocationList(data) {
     //create a new div for accordion child
      var child = listing.appendChild(document.createElement('div'));
      child.id = 'collapse'+ i;
-     child.className = 'collapse show';
+     child.className = 'collapse';
      var labelledby =  document.createAttribute('aria-labelledby');
      labelledby.value = 'heading'+ i;
      var parent =  document.createAttribute('data-parent');
@@ -263,7 +233,34 @@ function buildLocationList(data) {
      // create a new div for entities
      var entities = child.appendChild(document.createElement('div'));
      entities.id = 'entities';
-     entities.className = 'card-body entities';
+     entities.className = 'entities';
+     var toggleableLayerIds = ['Ponctuels', 'Lineaires', 'Surfaces'];
+     for (j = 0; j < toggleableLayerIds.length; j++) {
+          var currentFeature = toggleableLayerIds[j];
+          var entity = entities.appendChild(document.createElement('div'));
+          entity.className = 'item';
+          entity.id = 'entity-' + j;
+          var entitylink = entity.appendChild(document.createElement('a'));
+          entitylink.href = '#';
+          entitylink.className = 'title';
+          entitylink.dataPosition = j;
+          entitylink.innerHTML = currentFeature;
+          entitylink.onclick = function (e) {
+             var clickedLayer = this.textContent;
+             e.preventDefault();
+             e.stopPropagation();
+             var visibility = map.getLayoutProperty(clickedLayer, 'visibility');
+             if (visibility === 'visible') {
+                 map.setLayoutProperty(clickedLayer, 'visibility', 'none');
+                 this.className = 'visible';
+             } else {
+                 this.className = 'title';
+                 map.setLayoutProperty(clickedLayer, 'visibility', 'visible');
+             }
+          };
+     };
+
+
 
     link.addEventListener('click', function(e) {
       // Update the currentFeature to the store associated with the clicked link
@@ -365,7 +362,7 @@ a:hover {
 .listings .item {
   display: block;
   border-bottom: 1px solid #eee;
-  padding: 10px;
+  padding: 5px;
   text-decoration: none;
 }
 
@@ -388,6 +385,10 @@ a:hover {
 
 .listings .item.active .title,
 .listings .item .title:hover { color: #8cc63f; }
+
+.entities {
+  padding-left: 2%;
+}
 
 .listings .item.active {
   background-color: #f8f8f8;
