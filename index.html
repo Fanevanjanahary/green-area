@@ -91,6 +91,29 @@ map.on("load", function(e) {
     });
 
     map.addLayer({
+        "id": "Surfaces",
+        "type": "fill",
+        "source": "Surfaces",
+        "layout": {},
+        "paint": {
+            "fill-color": {
+               property: 'Type',
+               type:  'categorical',
+               stops: [
+                ['Autre_surface_minerale', '#b35a2a'],
+                ['Bassin/etang', '#377eb8'],
+                ['Bois', '#047200'],
+                ['Chaussee', '#898989'],
+                ['Chemin', '#f7e6b4'],
+                ['Gazon', '#2dd927'],
+                ['PrairieNaturelle/friche' , '#cde800'],
+              ]
+            },
+            'fill-opacity': 0.75
+        }
+    });
+
+    map.addLayer({
         "id": "Sites",
         "type": "symbol",
         "source": "Sites",
@@ -101,7 +124,7 @@ map.on("load", function(e) {
     });
 
     map.addLayer({
-        "id": "Ponctuels",
+        "id": "Arbre isolé",
         "type": "symbol",
         "source": "Ponctuels",
         "layout": {
@@ -112,7 +135,7 @@ map.on("load", function(e) {
     });
 
     map.addLayer({
-        "id": "Lineaires",
+        "id": "Haie",
         "type": "line",
         "source": "Lineaires",
         "paint": {
@@ -125,14 +148,6 @@ map.on("load", function(e) {
         },
     });
 
-    map.addLayer({
-        "id": "Surfaces",
-        "type": "line",
-        "source": "Surfaces",
-        "layout": {
-            "visibility": "visible"
-        },
-    });
 
     buildLocationList(sites, map);
     var features = map.queryRenderedFeatures(e.point, { layers: ['Sites'] });
@@ -161,15 +176,6 @@ map.on("load", function(e) {
   };
 
 });
-
-var layers = {
-      Streets: mapboxgl.tileLayer('mapbox.streets'),
-      Outdoors: mapboxgl.tileLayer('mapbox.outdoors'),
-      Satellite: mapboxgl.tileLayer('mapbox.satellite')
-};
-
-layers.Streets.addTo(map);
-mapboxgl.control.layers(layers).addTo(map);
 
 map.addControl(new mapboxgl.NavigationControl({
     showCompass: false
@@ -241,7 +247,7 @@ function buildLocationList(data, map) {
      var entities = child.appendChild(document.createElement('div'));
      entities.id = 'entities';
      entities.className = 'entities';
-     var toggleableLayerIds = ['Ponctuels', 'Lineaires', 'Surfaces'];
+     var toggleableLayerIds = ['Arbre isolé', 'Haie', 'Surfaces'];
      for (j = 0; j < toggleableLayerIds.length; j++) {
           var currentFeature = toggleableLayerIds[j];
           var entity = entities.appendChild(document.createElement('div'));
