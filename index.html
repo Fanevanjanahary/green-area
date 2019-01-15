@@ -307,6 +307,13 @@ function createPopUp(currentFeature) {
     .addTo(map);
 }
 
+map.on("sourcedata", function(e) {
+    if (map.getSource('Surfaces') && map.isSourceLoaded('Surfaces')) {
+        console.log('source loaded!');
+        var myFeatures = map.querySourceFeatures('Surfaces');
+        console.log(myFeatures);
+    }
+});
 
 </script>
 
