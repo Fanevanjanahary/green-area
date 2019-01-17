@@ -359,34 +359,34 @@ function createPopUp(currentFeature) {
     .setHTML('<h5>'+ currentFeature.properties.name + '</h5>' +
 	  '<img src="img/'+currentFeature.properties.id+'.PNG" class="rounded float-left" alt="..." width="50%">'+
 	  '<ul class="list-group">'+
-	  '<li class="list-group-item d-flex justify-content-between align-items-center">'+
+	    '<li class="list-group-item d-flex justify-content-between align-items-center">'+
 		'Surface'+
-      '<span class="badge badge-primary badge-pill">'+getSurfaceEmprice(currentFeature.properties.id)+' m²</span>'+
-	  '</li>'+
-	  '<li class="list-group-item d-flex justify-content-between align-items-center">'+
+        '<span class="badge badge-primary badge-pill">'+getSurfaceEmprice(currentFeature.properties.id)+' m²</span>'+
+	    '</li>'+
+	    '<li class="list-group-item d-flex justify-content-between align-items-center">'+
         'Nombre d'+'\''+' arbre isolés'+
-	  '<span class="badge badge-primary badge-pill">'+getNombrePoint(currentFeature.properties.id)+'</span>'+
-      '</li>'+
-	  '<li class="list-group-item d-flex justify-content-between align-items-center">'+
+	    '<span class="badge badge-primary badge-pill">'+getNombrePoint(currentFeature.properties.id)+'</span>'+
+        '</li>'+
+	    '<li class="list-group-item d-flex justify-content-between align-items-center">'+
 		'Longueur de haie'+
 		'<span class="badge badge-primary badge-pill">'+getLengthLine(currentFeature.properties.id)+' m</span>'+
-    '</li>'+
-    '<li class="list-group-item d-flex justify-content-between align-items-center">'+
+        '</li>'+
+        '<li class="list-group-item d-flex justify-content-between align-items-center">'+
 		'Surface totale Bassin/étang'+
 		'<span class="badge badge-primary badge-pill">'+getSurfaceTypePolygon(currentFeature.properties.id, "Bassin/etang")+' m²</span>'+
-    '</li>'+
-    '<li class="list-group-item d-flex justify-content-between align-items-center">'+
-		'Surface totale Bois'+
+        '</li>'+
+        '<li class="list-group-item d-flex justify-content-between align-items-center">'+
+		    'Surface totale Bois'+
 		'<span class="badge badge-primary badge-pill">'+getSurfaceTypePolygon(currentFeature.properties.id, "Bois")+' m²</span>'+
-    '</li>'+
-    '<li class="list-group-item d-flex justify-content-between align-items-center">'+
+        '</li>'+
+        '<li class="list-group-item d-flex justify-content-between align-items-center">'+
 		'Surface totale Chaussée'+
 		'<span class="badge badge-primary badge-pill">'+getSurfaceTypePolygon(currentFeature.properties.id, "Chaussee")+' m²</span>'+
-    '</li>'+
-    '<li class="list-group-item d-flex justify-content-between align-items-center">'+
-		'Surface totale Gazon'+
+        '</li>'+
+        '<li class="list-group-item d-flex justify-content-between align-items-center">'+
+		    'Surface totale Gazon'+
 		'<span class="badge badge-primary badge-pill">'+getSurfaceTypePolygon(currentFeature.properties.id, "Gazon")+' m²</span>'+
-	  '</li>'+
+	    '</li>'+
 	  '</ul>'
 	  )
     .addTo(map);
@@ -394,9 +394,9 @@ function createPopUp(currentFeature) {
 }
 
 function getSurfaceEmprice(idSite) {
-	for(isite = 0; isite< polygon.features.length; isite++){    
-	 	if(polygon.features[isite].properties["id"] == idSite && polygon.features[isite].properties["Type"] == "emprise"){
-	 		return polygon.features[isite].properties["Surface"];       
+	for(isite = 0; isite< emprise.features.length; isite++){
+	 	if(emprise.features[isite].properties["id"] == idSite) {
+	 		 return emprise.features[isite].properties["Surface"];
 	 	}        
 	};
 }
