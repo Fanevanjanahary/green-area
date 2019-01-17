@@ -47,12 +47,22 @@ mapboxgl.accessToken = 'pk.eyJ1IjoiZmFuZXZhIiwiYSI6ImNqZGxhOW5rMDA0bnkzM3A4MmJld
 
 var sites;
 var polygon;
+var line;
+var point;
 $.getJSON("data/site.geojson", function(json){
     sites = json;
 });
 
 $.getJSON("data/polygon.geojson", function(json){
     polygon = json;
+});
+
+$.getJSON("data/line.geojson", function(json){
+    line = json;
+});
+
+$.getJSON("data/point.geojson", function(json){
+    point = json;
 });
 
 var map = new mapboxgl.Map({
@@ -71,17 +81,30 @@ map.on("load", function(e) {
 
     map.addSource("Ponctuels", {
         "type": "geojson",
-        "data": "data/point.geojson"
+        "data": point
     });
 
     map.addSource("Lineaires", {
         "type": "geojson",
-        "data": "data/line.geojson"
+        "data": line
     });
 
      map.addSource("Surfaces", {
         "type": "geojson",
         "data": polygon
+    });
+
+    map.addLayer({
+        "id": "emprise",
+        "type": "line",
+        "source": "Surfaces",
+        "layout": {},
+        "filter": ["==", "Type", "emprise"],
+        "paint": {
+            "line-color": "red",
+            "line-width": 5,
+            "line-opacity": .8
+        },
     });
 
     polygon.features.forEach(function(feature) {
@@ -95,7 +118,7 @@ map.on("load", function(e) {
 					"type": "fill",
 					"source": "Surfaces",
 					"layout": {},
-					"filter": ["==", "Type", symbol],
+					"filter": ["!=", "Type", "emprise"],
 					"paint": {
                         "fill-color": {
                            property: 'Type',
@@ -180,14 +203,16 @@ map.on("load", function(e) {
             .setHTML(e.features[0].properties.type)
             .addTo(map);
     });
-
-    map.on("mouseenter", "Arbre isolé", function () {
-        map.getCanvas().style.cursor = "pointer";
-    });
-
-     map.on("mouseleave", "Arbre isolé", function () {
-        map.getCanvas().style.cursor = "";
-    });
+  
+  var measureControl = control.measure({
+    position: 'topleft',
+    primaryLengthUnit: 'meters',
+    secondaryLengthUnit: 'kilometers',
+    primaryAreaUnit: 'sqmeters',
+    secondaryAreaUnit: 'hectares'
+  });
+  measureControl.addTo(map);
+    
 })
 
 function buildLocationList(data, map) {
@@ -279,7 +304,15 @@ function buildLocationList(data, map) {
                  map.setLayoutProperty(clickedLayer, 'visibility', 'visible');
              }
           };
-     };
+         
+          map.on("mouseenter", toggleableLayerIds[j], function () {
+            map.getCanvas().style.cursor = "pointer";
+          });
+
+          map.on("mouseleave", toggleableLayerIds[j], function () {
+              map.getCanvas().style.cursor = "";
+              });
+          };
 	 
 	 
 
@@ -316,19 +349,35 @@ function createPopUp(currentFeature) {
   var popup = new mapboxgl.Popup({ closeOnClick: true })
     .setLngLat(currentFeature.geometry.coordinates)
     .setHTML('<h5>'+ currentFeature.properties.name + '</h5>' +
-	  '<img src="img/463558.jpg" class="rounded float-left" alt="..." width="50%">'+
+	  '<img src="img/'+currentFeature.properties.id+'.PNG" class="rounded float-left" alt="..." width="50%">'+
 	  '<ul class="list-group">'+
 	  '<li class="list-group-item d-flex justify-content-between align-items-center">'+
 		'Surface'+
-      '<span class="badge badge-primary badge-pill">'+getSurfaceEmprice(currentFeature.properties.id)+' m</span>'+
+      '<span class="badge badge-primary badge-pill">'+getSurfaceEmprice(currentFeature.properties.id)+' m²</span>'+
 	  '</li>'+
 	  '<li class="list-group-item d-flex justify-content-between align-items-center">'+
-        'Nombre Arbre isolé'+
-	  '<span class="badge badge-primary badge-pill">2</span>'+
+        'Nombre d'+'\''+' arbre isolé'+
+	  '<span class="badge badge-primary badge-pill">'+getNombrePoint(currentFeature.properties.id)+'</span>'+
       '</li>'+
 	  '<li class="list-group-item d-flex justify-content-between align-items-center">'+
-		'Morbi leo risus'+
-		'<span class="badge badge-primary badge-pill">1</span>'+
+		'Longueur d'+ '\''+' haie'+
+		'<span class="badge badge-primary badge-pill">'+getLengthLine(currentFeature.properties.id)+' m</span>'+
+    '</li>'+
+    '<li class="list-group-item d-flex justify-content-between align-items-center">'+
+		'Surface Bassin/etang'+
+		'<span class="badge badge-primary badge-pill">'+getSurfaceTypePolygon(currentFeature.properties.id, "Bassin/etang")+' m²</span>'+
+    '</li>'+
+    '<li class="list-group-item d-flex justify-content-between align-items-center">'+
+		'Surface Bois'+
+		'<span class="badge badge-primary badge-pill">'+getSurfaceTypePolygon(currentFeature.properties.id, "Bois")+' m²</span>'+
+    '</li>'+
+    '<li class="list-group-item d-flex justify-content-between align-items-center">'+
+		'Surface Chaussee'+
+		'<span class="badge badge-primary badge-pill">'+getSurfaceTypePolygon(currentFeature.properties.id, "Chaussee")+' m²</span>'+
+    '</li>'+
+    '<li class="list-group-item d-flex justify-content-between align-items-center">'+
+		'Surface Gazon'+
+		'<span class="badge badge-primary badge-pill">'+getSurfaceTypePolygon(currentFeature.properties.id, "Gazon")+' m²</span>'+
 	  '</li>'+
 	  '</ul>'
 	  )
@@ -344,18 +393,49 @@ function getSurfaceEmprice(idSite) {
 	};
 }
 
+function getSurfaceTypePolygon(idSite, type) {
+  var sum = 0;
+  
+	for(isite = 0; isite< polygon.features.length; isite++){    
+	 	if(polygon.features[isite].properties["id"] == idSite && polygon.features[isite].properties["Type"] == type){
+      sum += parseFloat(polygon.features[isite].properties["Surface"]);       
+	 	}        
+  };
+  return sum.toFixed();
+}
+
+function getNombrePoint(idSite) {
+  var sum = 0;
+	for(isite = 0; isite< point.features.length; isite++){    
+	 	if(point.features[isite].properties["id"] == idSite){
+      sum ++;       
+	 	}        
+  };
+  return sum;
+}
+
+function getLengthLine(idSite) {
+  var sum = 0;
+	for(isite = 0; isite< line.features.length; isite++){    
+	 	if(line.features[isite].properties["id"] == idSite){
+      sum += parseFloat(line.features[isite].properties["longueur"]);       
+	 	}        
+  };
+  return sum.toFixed();
+}
+
 </script>
 
 <style>
 
-#map { position:absolute; top:0; bottom:0; width:75%; }
+#map { position:absolute; top:0; bottom:0; width:75%; height:100%; }
  body {
   color: #404040;
   font: 400 15px/22px 'Source Sans Pro', 'Helvetica Neue', Sans-serif;
   margin: 0;
   padding: 0;
   -webkit-font-smoothing: antialiased;
-}
+ }
 
 * {
   -webkit-box-sizing: border-box;
@@ -420,7 +500,7 @@ a:hover {
 
 .listings .item .visible {
   display: block;
-  color: #046380e;
+  color: #04680e;
   font-weight: 700;
 }
 
@@ -472,7 +552,7 @@ a:hover {
 .mapboxgl-popup-content {
   font: 400 11px/15px 'Source Sans Pro', 'Helvetica Neue', Sans-serif;
   padding: 0;
-  width: 400px;
+  width: 500px;
 }
 
 .mapboxgl-popup-content-wrapper {
@@ -509,11 +589,16 @@ a:hover {
 }
 
 .mapboxgl-popup-content ul {
-  display: block;
   padding: 5px;
-  font-weight: 700;
+  font-weight: 600;
   margin-top: 5px;
+  font-size: 12px;
 
+}
+
+.badge-primary {
+    color: #0b0a0a;
+    background-color: #0c0c0c4d;
 }
 
 .mapboxgl-popup-content div {
