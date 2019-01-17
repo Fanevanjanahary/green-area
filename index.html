@@ -135,7 +135,14 @@ map.on("load", function(e) {
                         },
                         'fill-opacity': 0.75
                     }
-				});
+        });
+        
+        map.on("click", layerID, function (e) {
+        new mapboxgl.Popup()
+            .setLngLat(e.lngLat)
+            .setHTML(feature.properties['Type'])
+            .addTo(map);
+    });
 
 			}
     });
@@ -311,11 +318,10 @@ function buildLocationList(data, map) {
 
           map.on("mouseleave", toggleableLayerIds[j], function () {
               map.getCanvas().style.cursor = "";
-              });
-          };
-	 
-	 
+          });
 
+        };
+	 
     link.addEventListener('click', function(e) {
       // Update the currentFeature to the store associated with the clicked link
       var clickedListing = sites.features[this.dataPosition];
@@ -356,27 +362,27 @@ function createPopUp(currentFeature) {
       '<span class="badge badge-primary badge-pill">'+getSurfaceEmprice(currentFeature.properties.id)+' m²</span>'+
 	  '</li>'+
 	  '<li class="list-group-item d-flex justify-content-between align-items-center">'+
-        'Nombre d'+'\''+' arbre isolé'+
+        'Nombre d'+'\''+' arbre isolés'+
 	  '<span class="badge badge-primary badge-pill">'+getNombrePoint(currentFeature.properties.id)+'</span>'+
       '</li>'+
 	  '<li class="list-group-item d-flex justify-content-between align-items-center">'+
-		'Longueur d'+ '\''+' haie'+
+		'Longueur de haie'+
 		'<span class="badge badge-primary badge-pill">'+getLengthLine(currentFeature.properties.id)+' m</span>'+
     '</li>'+
     '<li class="list-group-item d-flex justify-content-between align-items-center">'+
-		'Surface Bassin/etang'+
+		'Surface totale Bassin/étang'+
 		'<span class="badge badge-primary badge-pill">'+getSurfaceTypePolygon(currentFeature.properties.id, "Bassin/etang")+' m²</span>'+
     '</li>'+
     '<li class="list-group-item d-flex justify-content-between align-items-center">'+
-		'Surface Bois'+
+		'Surface totale Bois'+
 		'<span class="badge badge-primary badge-pill">'+getSurfaceTypePolygon(currentFeature.properties.id, "Bois")+' m²</span>'+
     '</li>'+
     '<li class="list-group-item d-flex justify-content-between align-items-center">'+
-		'Surface Chaussee'+
+		'Surface totale Chaussée'+
 		'<span class="badge badge-primary badge-pill">'+getSurfaceTypePolygon(currentFeature.properties.id, "Chaussee")+' m²</span>'+
     '</li>'+
     '<li class="list-group-item d-flex justify-content-between align-items-center">'+
-		'Surface Gazon'+
+		'Surface totale Gazon'+
 		'<span class="badge badge-primary badge-pill">'+getSurfaceTypePolygon(currentFeature.properties.id, "Gazon")+' m²</span>'+
 	  '</li>'+
 	  '</ul>'
@@ -592,7 +598,7 @@ a:hover {
   padding: 5px;
   font-weight: 600;
   margin-top: 5px;
-  font-size: 12px;
+  font-size: 13px;
 
 }
 
