@@ -47,6 +47,8 @@ mapboxgl.accessToken = 'pk.eyJ1IjoiZmFuZXZhIiwiYSI6ImNqZGxhOW5rMDA0bnkzM3A4MmJld
 
 var sites;
 var polygon;
+var emprise;
+
 $.getJSON("data/site.geojson", function(json){
     sites = json;
 });
@@ -54,6 +56,11 @@ $.getJSON("data/site.geojson", function(json){
 $.getJSON("data/polygon.geojson", function(json){
     polygon = json;
 });
+
+$.getJSON("data/emprise.geojson", function(json){
+    emprise = json;
+});
+
 
 var map = new mapboxgl.Map({
     container: 'map',
@@ -63,6 +70,11 @@ var map = new mapboxgl.Map({
 });
 
 map.on("load", function(e) {
+
+    map.addSource("emprise", {
+        "type": "geojson",
+        "data": emprise
+    });
 
     map.addSource("Sites", {
         "type": "geojson",
@@ -82,6 +94,18 @@ map.on("load", function(e) {
      map.addSource("Surfaces", {
         "type": "geojson",
         "data": polygon
+    });
+
+    map.addLayer({
+        "id": "Emprise",
+        "type": "line",
+        "source": "emprise",
+        "layout": {},
+        "paint": {
+            "line-color": "red",
+            "line-width": 5,
+            "line-opacity": .8
+        },
     });
 
     polygon.features.forEach(function(feature) {
@@ -116,6 +140,8 @@ map.on("load", function(e) {
 
 			}
     });
+
+
 
     map.addLayer({
         "id": "Sites",
@@ -248,7 +274,7 @@ function buildLocationList(data, map) {
      var entities = child.appendChild(document.createElement('div'));
      entities.id = 'entities';
      entities.className = 'entities';
-     var toggleableLayerIds = ['Arbre isolé', 'Haie'];
+     var toggleableLayerIds = ['Arbre isolé', 'Haie', 'Emprise'];
 	 var uniqueType = [];
 	 for(k = 0; k< polygon.features.length; k++){    
 	 	if(uniqueType.indexOf(polygon.features[k].properties["Type"]) === -1){
