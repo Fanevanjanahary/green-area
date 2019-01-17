@@ -49,6 +49,8 @@ var sites;
 var polygon;
 var emprise;
 
+var line;
+var point;
 $.getJSON("data/site.geojson", function(json){
     sites = json;
 });
@@ -61,6 +63,14 @@ $.getJSON("data/emprise.geojson", function(json){
     emprise = json;
 });
 
+
+$.getJSON("data/line.geojson", function(json){
+    line = json;
+});
+
+$.getJSON("data/point.geojson", function(json){
+    point = json;
+});
 
 var map = new mapboxgl.Map({
     container: 'map',
@@ -83,12 +93,12 @@ map.on("load", function(e) {
 
     map.addSource("Ponctuels", {
         "type": "geojson",
-        "data": "data/point.geojson"
+        "data": point
     });
 
     map.addSource("Lineaires", {
         "type": "geojson",
-        "data": "data/line.geojson"
+        "data": line
     });
 
      map.addSource("Surfaces", {
@@ -140,8 +150,6 @@ map.on("load", function(e) {
 
 			}
     });
-
-
 
     map.addLayer({
         "id": "Sites",
@@ -305,9 +313,16 @@ function buildLocationList(data, map) {
                  map.setLayoutProperty(clickedLayer, 'visibility', 'visible');
              }
           };
-     };
-	 
-	 
+
+          map.on("mouseenter", toggleableLayerIds[j], function () {
+            map.getCanvas().style.cursor = "pointer";
+          });
+
+          map.on("mouseleave", toggleableLayerIds[j], function () {
+              map.getCanvas().style.cursor = "";
+          });
+
+        };
 
     link.addEventListener('click', function(e) {
       // Update the currentFeature to the store associated with the clicked link
@@ -342,19 +357,35 @@ function createPopUp(currentFeature) {
   var popup = new mapboxgl.Popup({ closeOnClick: true })
     .setLngLat(currentFeature.geometry.coordinates)
     .setHTML('<h5>'+ currentFeature.properties.name + '</h5>' +
-	  '<img src="img/463558.jpg" class="rounded float-left" alt="..." width="50%">'+
+	  '<img src="img/'+currentFeature.properties.id+'.PNG" class="rounded float-left" alt="..." width="50%">'+
 	  '<ul class="list-group">'+
 	  '<li class="list-group-item d-flex justify-content-between align-items-center">'+
 		'Surface'+
-      '<span class="badge badge-primary badge-pill">'+getSurfaceEmprice(currentFeature.properties.id)+' m</span>'+
+      '<span class="badge badge-primary badge-pill">'+getSurfaceEmprice(currentFeature.properties.id)+' m²</span>'+
 	  '</li>'+
 	  '<li class="list-group-item d-flex justify-content-between align-items-center">'+
-        'Nombre Arbre isolé'+
-	  '<span class="badge badge-primary badge-pill">2</span>'+
+        'Nombre d'+'\''+' arbre isolés'+
+	  '<span class="badge badge-primary badge-pill">'+getNombrePoint(currentFeature.properties.id)+'</span>'+
       '</li>'+
 	  '<li class="list-group-item d-flex justify-content-between align-items-center">'+
-		'Morbi leo risus'+
-		'<span class="badge badge-primary badge-pill">1</span>'+
+		'Longueur de haie'+
+		'<span class="badge badge-primary badge-pill">'+getLengthLine(currentFeature.properties.id)+' m</span>'+
+    '</li>'+
+    '<li class="list-group-item d-flex justify-content-between align-items-center">'+
+		'Surface totale Bassin/étang'+
+		'<span class="badge badge-primary badge-pill">'+getSurfaceTypePolygon(currentFeature.properties.id, "Bassin/etang")+' m²</span>'+
+    '</li>'+
+    '<li class="list-group-item d-flex justify-content-between align-items-center">'+
+		'Surface totale Bois'+
+		'<span class="badge badge-primary badge-pill">'+getSurfaceTypePolygon(currentFeature.properties.id, "Bois")+' m²</span>'+
+    '</li>'+
+    '<li class="list-group-item d-flex justify-content-between align-items-center">'+
+		'Surface totale Chaussée'+
+		'<span class="badge badge-primary badge-pill">'+getSurfaceTypePolygon(currentFeature.properties.id, "Chaussee")+' m²</span>'+
+    '</li>'+
+    '<li class="list-group-item d-flex justify-content-between align-items-center">'+
+		'Surface totale Gazon'+
+		'<span class="badge badge-primary badge-pill">'+getSurfaceTypePolygon(currentFeature.properties.id, "Gazon")+' m²</span>'+
 	  '</li>'+
 	  '</ul>'
 	  )
@@ -370,18 +401,49 @@ function getSurfaceEmprice(idSite) {
 	};
 }
 
+function getSurfaceTypePolygon(idSite, type) {
+  var sum = 0;
+
+	for(isite = 0; isite< polygon.features.length; isite++){
+	 	if(polygon.features[isite].properties["id"] == idSite && polygon.features[isite].properties["Type"] == type){
+      sum += parseFloat(polygon.features[isite].properties["Surface"]);
+	 	}
+  };
+  return sum.toFixed();
+}
+
+function getNombrePoint(idSite) {
+  var sum = 0;
+	for(isite = 0; isite< point.features.length; isite++){
+	 	if(point.features[isite].properties["id"] == idSite){
+      sum ++;
+	 	}
+  };
+  return sum;
+}
+
+function getLengthLine(idSite) {
+  var sum = 0;
+	for(isite = 0; isite< line.features.length; isite++){
+	 	if(line.features[isite].properties["id"] == idSite){
+      sum += parseFloat(line.features[isite].properties["longueur"]);
+	 	}
+  };
+  return sum.toFixed();
+}
+
 </script>
 
 <style>
 
-#map { position:absolute; top:0; bottom:0; width:75%; }
+#map { position:absolute; top:0; bottom:0; width:75%; height:100%; }
  body {
   color: #404040;
   font: 400 15px/22px 'Source Sans Pro', 'Helvetica Neue', Sans-serif;
   margin: 0;
   padding: 0;
   -webkit-font-smoothing: antialiased;
-}
+ }
 
 * {
   -webkit-box-sizing: border-box;
@@ -446,7 +508,7 @@ a:hover {
 
 .listings .item .visible {
   display: block;
-  color: #046380e;
+  color: #04680e;
   font-weight: 700;
 }
 
@@ -498,7 +560,7 @@ a:hover {
 .mapboxgl-popup-content {
   font: 400 11px/15px 'Source Sans Pro', 'Helvetica Neue', Sans-serif;
   padding: 0;
-  width: 400px;
+  width: 500px;
 }
 
 .mapboxgl-popup-content-wrapper {
@@ -535,11 +597,16 @@ a:hover {
 }
 
 .mapboxgl-popup-content ul {
-  display: block;
   padding: 5px;
-  font-weight: 700;
+  font-weight: 600;
   margin-top: 5px;
+  font-size: 13px;
 
+}
+
+.badge-primary {
+    color: #0b0a0a;
+    background-color: #0c0c0c4d;
 }
 
 .mapboxgl-popup-content div {
