@@ -17,8 +17,17 @@
         #menu {
             position: absolute;
             background: #fff;
-            left: 25%;
-            font-family: 'Open Sans', sans-serif;
+            right: 0;
+            top: 65%;
+            height: 50px;
+            width: 50px;
+            border-radius: 50%;
+            align-items: center
+          
+        }
+        #menu img{
+          padding-top: 5%;
+          margin-left: 25%;
         }
     </style>
 </head>
@@ -33,6 +42,9 @@
 </div>
 
 <div id='map' class='map'></div>
+<div id='menu' class="align-bottom">
+  <a href="http://www.futurmap.com/"><img src="img/logo.png" class="center-block" width="45%"></a>
+</div>
 <script>
 
 if (!('remove' in Element.prototype)) {
