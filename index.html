@@ -165,11 +165,14 @@ map.on("load", function(e) {
           new mapboxgl.Popup()
           .setLngLat(e.lngLat)
           .setHTML('<h1 classe="item">'+layerID+'</h1>'+
-          '<p><span>ID site</span>'+ 
-           +feature.properties["id"]+
+          '<p><span>Numéro de chantier</span>'+ 
+           +feature.properties["num_chant"]+
           '</p>'+
-          '<p><span>Surface</span>'+ 
-           +feature.properties["Surface"]+' m²'+
+          '<p><span>Aire</span>'+ 
+           +feature.properties["aire"]+' m²'+
+          '</p>'+
+          '<p><span>Perimètre</span>'+ 
+           +feature.properties["perimetre"]+' m²'+
           '</p>'
           )
           .addTo(map);
@@ -390,36 +393,36 @@ function createPopUp(currentFeature) {
   var popup = new mapboxgl.Popup({ closeOnClick: true })
     .setLngLat(currentFeature.geometry.coordinates)
     .setHTML('<div>'+
-    '<h5>'+ currentFeature.properties.name + '</h5>' +
+    '<h5>'+ currentFeature.properties.nom_site + '</h5>' +
 	  '<img src="img/'+currentFeature.properties.id+'.PNG" class="rounded float-left" alt="..." width="50%">'+
 	  '<ul class="list-group">'+
 	    '<li class="list-group-item d-flex justify-content-between align-items-center">'+
 		'Surface'+
-        '<span class="badge badge-primary badge-pill">'+getSurfaceEmprice(currentFeature.properties.id)+' m²</span>'+
+        '<span class="badge badge-primary badge-pill">'+getSurfaceEmprice(currentFeature.properties.num_chant)+' m²</span>'+
 	    '</li>'+
 	    '<li class="list-group-item d-flex justify-content-between align-items-center">'+
         'Nombre d'+'\''+' arbre isolés'+
-	    '<span class="badge badge-primary badge-pill">'+getNombrePoint(currentFeature.properties.id)+'</span>'+
+	    '<span class="badge badge-primary badge-pill">'+getNombrePoint(currentFeature.properties.num_chant)+'</span>'+
         '</li>'+
 	    '<li class="list-group-item d-flex justify-content-between align-items-center">'+
-		'Longueur de haie'+
-		'<span class="badge badge-primary badge-pill">'+getLengthLine(currentFeature.properties.id)+' m</span>'+
+		'Longueur de haies'+
+		'<span class="badge badge-primary badge-pill">'+getLengthLine(currentFeature.properties.num_chant)+' m</span>'+
         '</li>'+
         '<li class="list-group-item d-flex justify-content-between align-items-center">'+
-		'Surface totale Bassin/étang'+
-		'<span class="badge badge-primary badge-pill">'+getSurfaceTypePolygon(currentFeature.properties.id, "Bassin/etang")+' m²</span>'+
+		'Surface totale Bassins et lagunes'+
+		'<span class="badge badge-primary badge-pill">'+getSurfaceTypePolygon(currentFeature.properties.num_chant, "Bassins et lagunes")+' m²</span>'+
         '</li>'+
         '<li class="list-group-item d-flex justify-content-between align-items-center">'+
-		    'Surface totale Bois'+
-		'<span class="badge badge-primary badge-pill">'+getSurfaceTypePolygon(currentFeature.properties.id, "Bois")+' m²</span>'+
+		    'Surface totale Strate Arborée'+
+		'<span class="badge badge-primary badge-pill">'+getSurfaceTypePolygon(currentFeature.properties.num_chant, "Strate Arborée")+' m²</span>'+
         '</li>'+
         '<li class="list-group-item d-flex justify-content-between align-items-center">'+
-		'Surface totale Chaussée'+
-		'<span class="badge badge-primary badge-pill">'+getSurfaceTypePolygon(currentFeature.properties.id, "Chaussee")+' m²</span>'+
+		'Surface totale Strate herbacés'+
+		'<span class="badge badge-primary badge-pill">'+getSurfaceTypePolygon(currentFeature.properties.num_chant, "Strate herbacés")+' m²</span>'+
         '</li>'+
         '<li class="list-group-item d-flex justify-content-between align-items-center">'+
-		    'Surface totale Gazon'+
-		'<span class="badge badge-primary badge-pill">'+getSurfaceTypePolygon(currentFeature.properties.id, "Gazon")+' m²</span>'+
+		    'Surface totale Surface perméables'+
+		'<span class="badge badge-primary badge-pill">'+getSurfaceTypePolygon(currentFeature.properties.num_chant, "Surface perméables")+' m²</span>'+
 	    '</li>'+
 	  '</ul>'+
     '</div>'
@@ -430,7 +433,7 @@ function createPopUp(currentFeature) {
 
 function getSurfaceEmprice(idSite) {
 	for(isite = 0; isite< emprise.features.length; isite++){
-	 	if(emprise.features[isite].properties["id"] == idSite) {
+	 	if(emprise.features[isite].properties["num_chant"] == idSite) {
 	 		 return emprise.features[isite].properties["Surface"];
 	 	}        
 	};
@@ -440,8 +443,8 @@ function getSurfaceTypePolygon(idSite, type) {
   var sum = 0;
 
 	for(isite = 0; isite< polygon.features.length; isite++){
-	 	if(polygon.features[isite].properties["id"] == idSite && polygon.features[isite].properties["Type"] == type){
-      sum += parseFloat(polygon.features[isite].properties["Surface"]);
+	 	if(polygon.features[isite].properties["num_chant"] == idSite && polygon.features[isite].properties["type_esp_v"] == type){
+      sum += parseFloat(polygon.features[isite].properties["aire"]);
 	 	}
   };
   return sum.toFixed();
@@ -450,7 +453,7 @@ function getSurfaceTypePolygon(idSite, type) {
 function getNombrePoint(idSite) {
   var sum = 0;
 	for(isite = 0; isite< point.features.length; isite++){
-	 	if(point.features[isite].properties["id"] == idSite){
+	 	if(point.features[isite].properties["num_chant"] == idSite){
       sum ++;
 	 	}
   };
@@ -460,7 +463,7 @@ function getNombrePoint(idSite) {
 function getLengthLine(idSite) {
   var sum = 0;
 	for(isite = 0; isite< line.features.length; isite++){
-	 	if(line.features[isite].properties["id"] == idSite){
+	 	if(line.features[isite].properties["num_chant"] == idSite){
       sum += parseFloat(line.features[isite].properties["longueur"]);
 	 	}
   };
