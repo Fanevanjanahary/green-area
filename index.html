@@ -26,9 +26,10 @@
           
         }
         #menu img{
-          padding-top: 5%;
+          padding-top: 10%;
           margin-left: 25%;
         }
+      
     </style>
 </head>
 <body>
@@ -63,11 +64,11 @@ var emprise;
 
 var line;
 var point;
-$.getJSON("data/site.geojson", function(json){
+$.getJSON("data/SITES.geojson", function(json){
     sites = json;
 });
 
-$.getJSON("data/polygon.geojson", function(json){
+$.getJSON("data/SURFACES.geojson", function(json){
     polygon = json;
 });
 
@@ -76,11 +77,11 @@ $.getJSON("data/emprise.geojson", function(json){
 });
 
 
-$.getJSON("data/line.geojson", function(json){
+$.getJSON("data/LINEAIRES.geojson", function(json){
     line = json;
 });
 
-$.getJSON("data/point.geojson", function(json){
+$.getJSON("data/PONCTUELS.geojson", function(json){
     point = json;
 });
 
@@ -131,7 +132,7 @@ map.on("load", function(e) {
     });
 
     polygon.features.forEach(function(feature) {
-        var symbol = feature.properties['Type'];
+        var symbol = feature.properties['type_esp_v'];
         var layerID = symbol;
 
         // Add a layer for this symbol type if it hasn't been added already.
@@ -141,19 +142,19 @@ map.on("load", function(e) {
 					"type": "fill",
 					"source": "Surfaces",
 					"layout": {},
-					"filter": ["==", "Type", symbol],
+					"filter": ["==", "type_esp_v", symbol],
 					"paint": {
                         "fill-color": {
-                           property: 'Type',
+                           property: 'type_esp_v',
                            type:  'categorical',
                            stops: [
-                            ['Autre Surface Minérale', '#b35a2a'],
-                            ['Bassin / étang', '#377eb8'],
-                            ['Bois', '#047200'],
-                            ['Chaussée', '#898989'],
-                            ['Chemin', '#f7e6b4'],
-                            ['Gazon', '#2dd927'],
-                            ['Prairie Naturelle / Friche' , '#cde800'],
+                            ['Terrasse et toits', '#b35a2a'],
+                            ['Bassins et lagunes', '#377eb8'],
+                            ['Strate herbacés', '#047200'],
+                            ['Strate Arbustives', '#898989'],
+                            ['Surfaces imperméables', '#f7e6b4'],
+                            ['Strate Arborée', '#2dd927'],
+                            ['Surface perméables' , '#cde800'],
                           ]
                         },
                         'fill-opacity': 0.75
@@ -188,7 +189,7 @@ map.on("load", function(e) {
     });
 
     map.addLayer({
-        "id": "Arbre isolé",
+        "id": "Arbres isolés",
         "type": "symbol",
         "source": "Ponctuels",
         "layout": {
@@ -200,7 +201,7 @@ map.on("load", function(e) {
     });
 
     map.addLayer({
-        "id": "Haie",
+        "id": "Haies",
         "type": "line",
         "source": "Lineaires",
         "paint": {
@@ -228,12 +229,12 @@ map.on("load", function(e) {
         trackUserLocation: true
     }));
 
-  map.on("click", "Haie", function (e) {
+  map.on("click", "Haies", function (e) {
    new mapboxgl.Popup()
      .setLngLat(e.lngLat)
      .setHTML('<h1 classe="item">Haie</h1>'+
-         '<p><span>ID site</span>'
-           +e.features[0].properties.id+
+         '<p><span>Numéro de chantier</span>'
+           +e.features[0].properties.num_chant+
          '</p>'+
          '<p><span>Longueur</span>'+ 
           +parseFloat(e.features[0].properties.longueur).toFixed()+' m'+
@@ -242,12 +243,12 @@ map.on("load", function(e) {
      .addTo(map);
 });
  
-map.on("click", "Arbre isolé", function (e) {
+map.on("click", "Arbres isolés", function (e) {
   new mapboxgl.Popup()
     .setLngLat(e.lngLat)
-    .setHTML('<h1 classe="item">Arbre</h1>'+
-         '<p><span>ID site</span>' 
-          +e.features[0].properties.id+
+    .setHTML('<h1 classe="item">Arbre isolé</h1>'+
+         '<p><span>Numéro de chantier</span>' 
+          +e.features[0].properties.num_chant+
          '</p>'
       )
     .addTo(map);
@@ -276,7 +277,7 @@ function buildLocationList(data, map) {
     link.href = '#';
     link.className = 'title';
     link.dataPosition = i;
-    link.innerHTML = prop.id;
+    link.innerHTML = prop.num_chant;
 
     // create another element
     var toggle =  document.createAttribute('data-toggle');
@@ -297,7 +298,7 @@ function buildLocationList(data, map) {
     // Create a new div with the class 'details' for each store
     // and fill it with the city and phone number
     var details = listing.appendChild(document.createElement('div'));
-    details.innerHTML = prop.name;
+    details.innerHTML = prop.nom_site;
 
     //create a new div for accordion child
      var child = listing.appendChild(document.createElement('div'));
@@ -314,11 +315,11 @@ function buildLocationList(data, map) {
      var entities = child.appendChild(document.createElement('div'));
      entities.id = 'entities';
      entities.className = 'entities';
-     var toggleableLayerIds = ['Arbre isolé', 'Haie', 'Emprise'];
+     var toggleableLayerIds = ['Arbres isolés', 'Haies', 'Emprise'];
 	 var uniqueType = [];
 	 for(k = 0; k< polygon.features.length; k++){    
-	 	if(uniqueType.indexOf(polygon.features[k].properties["Type"]) === -1){
-	 		uniqueType.push(polygon.features[k].properties["Type"]);        
+	 	if(uniqueType.indexOf(polygon.features[k].properties["type_esp_v"]) === -1){
+	 		uniqueType.push(polygon.features[k].properties["type_esp_v"]);        
 	 	}        
 	 };
 	 Array.prototype.push.apply(toggleableLayerIds, uniqueType);
