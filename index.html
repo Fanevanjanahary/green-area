@@ -166,22 +166,6 @@ map.on("load", function(e) {
                     }
 				});
         
-        map.on("click", layerID, function (e) {
-          new mapboxgl.Popup()
-          .setLngLat(e.lngLat)
-          .setHTML('<h1 classe="item">'+layerID+'</h1>'+
-          '<p><span>Numéro de chantier</span>'+ 
-           +feature.properties["num_chant"]+
-          '</p>'+
-          '<p><span>Aire</span>'+ 
-           +feature.properties["aire"]+' m²'+
-          '</p>'+
-          '<p><span>Perimètre</span>'+ 
-           +feature.properties["perimetre"]+' m'+
-          '</p>'
-          )
-          .addTo(map);
-        });
 			}
 
     });
@@ -223,12 +207,12 @@ map.on("load", function(e) {
     });
 
 
-  buildLocationList(sites, map);
+    buildLocationList(sites, map);
 
-   map.addControl(new mapboxgl.NavigationControl({
-       showCompass: false
-       }), 'top-right'
-   );
+    map.addControl(new mapboxgl.NavigationControl({
+        showCompass: false
+        }), 'top-right'
+    );
 
     map.addControl(new mapboxgl.GeolocateControl({
         positionOptions: {
@@ -237,34 +221,61 @@ map.on("load", function(e) {
         trackUserLocation: true
     }));
 
-  map.on("click", "Haies", function (e) {
-   new mapboxgl.Popup()
-     .setLngLat(e.lngLat)
-     .setHTML('<h1 classe="item">Haie</h1>'+
-         '<p><span>Numéro de chantier</span>'
-           +e.features[0].properties.num_chant+
-         '</p>'+
-         '<p><span>Longueur</span>'+ 
-          +parseFloat(e.features[0].properties.longueur).toFixed()+' m'+
-         '</p>'
-         )
-     .addTo(map);
-});
+    map.on("click", "Haies", function (e) {
+      new mapboxgl.Popup()
+        .setLngLat(e.lngLat)
+        .setHTML('<h1 classe="item">Haie</h1>'+
+            '<p><span>Numéro de chantier</span>'
+              +e.features[0].properties.num_chant+
+            '</p>'+
+            '<p><span>Longueur</span>'+ 
+              +parseFloat(e.features[0].properties.longueur).toFixed()+' m'+
+            '</p>'
+            )
+        .addTo(map);
+     });
  
-map.on("click", "Arbres isolés", function (e) {
-  new mapboxgl.Popup()
-    .setLngLat(e.lngLat)
-    .setHTML('<h1 classe="item">Arbre isolé</h1>'+
-         '<p><span>Numéro de chantier</span>' 
-          +e.features[0].properties.num_chant+
-         '</p>'
-      )
-    .addTo(map);
-});
+    map.on("click", "Arbres isolés", function (e) {
+      new mapboxgl.Popup()
+        .setLngLat(e.lngLat)
+        .setHTML('<h1 classe="item">Arbre isolé</h1>'+
+            '<p><span>Numéro de chantier</span>' 
+              +e.features[0].properties.num_chant+
+            '</p>'
+          )
+        .addTo(map);
+    });
 
+    for(item_site=0; item_site < getUniquetypePolygon().length; item_site++) {
+      map.on("click", getUniquetypePolygon()[item_site], function (e) {
+                new mapboxgl.Popup()
+                .setLngLat(e.lngLat)
+                .setHTML('<h1 classe="item">'+e.features[0].properties.type_esp_v+'</h1>'+
+                '<p><span>Numéro de chantier</span>'+ 
+                +e.features[0].properties.num_chant+
+                '</p>'+
+                '<p><span>Aire</span>'+ 
+                +e.features[0].properties.aire+' m²'+
+                '</p>'+
+                '<p><span>Perimètre</span>'+ 
+                +e.features[0].properties.perimetre+' m'+
+                '</p>'
+                )
+                .addTo(map);
+        });
+     }
+//end map.on (load)
 })
 
-
+function getUniquetypePolygon(){
+  var ret = [];
+  for(k = 0; k< polygon.features.length; k++){    
+	 	if(ret.indexOf(polygon.features[k].properties["type_esp_v"]) === -1){
+      ret.push(polygon.features[k].properties["type_esp_v"]);        
+	 	}        
+	 };
+  return ret
+}
 function buildLocationList(data, map) {
   // Iterate through the list of stores
   for (i = 0; i < data.features.length; i++) {
@@ -324,12 +335,8 @@ function buildLocationList(data, map) {
      entities.id = 'entities';
      entities.className = 'entities';
      var toggleableLayerIds = ['Arbres isolés', 'Haies', 'Emprise'];
-	 var uniqueType = [];
-	 for(k = 0; k< polygon.features.length; k++){    
-	 	if(uniqueType.indexOf(polygon.features[k].properties["type_esp_v"]) === -1){
-	 		uniqueType.push(polygon.features[k].properties["type_esp_v"]);        
-	 	}        
-	 };
+	   var uniqueType = getUniquetypePolygon();
+	 
 	 Array.prototype.push.apply(toggleableLayerIds, uniqueType);
      for (j = 0; j < toggleableLayerIds.length; j++) {
           var currentFeature = toggleableLayerIds[j];
