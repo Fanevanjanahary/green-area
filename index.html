@@ -38,8 +38,13 @@
   <div class='heading'>
     <h1>Tarvel - Projet SIG WEB</h1>
   </div>
+  <div class='map-overlay'>
+    <fieldset>
+      <input id='feature-filter' type='text' placeholder='Recherche par numéro de chantier' />
+    </fieldset>
     <div id="accordion" class="listings">
     </div>
+  </div>
 </div>
 
 <div id='map' class='map'></div>
@@ -148,13 +153,13 @@ map.on("load", function(e) {
                            property: 'type_esp_v',
                            type:  'categorical',
                            stops: [
-                            ['Terrasse et toits', '#b35a2a'],
-                            ['Bassins et lagunes', '#377eb8'],
-                            ['Strate herbacés', '#047200'],
-                            ['Strate Arbustives', '#898989'],
-                            ['Surfaces imperméables', '#f7e6b4'],
-                            ['Strate Arborée', '#2dd927'],
-                            ['Surface perméables' , '#cde800'],
+                            ['Strates herbacées', '#aede00'],
+                            ['Strates arbustives', '#ff6d6d'],
+                            ['Strates arborées', '#14b000'],
+                            ['Bassins et lagunes', '#01b7ff'],
+                            ['Surfaces imperméables', '#b9b9b9'],
+                            ['Surfaces perméables' , '#b46c00'],
+                            ['Terrasse et toits', '#febf00'],   
                           ]
                         },
                         'fill-opacity': 0.75
@@ -172,7 +177,7 @@ map.on("load", function(e) {
            +feature.properties["aire"]+' m²'+
           '</p>'+
           '<p><span>Perimètre</span>'+ 
-           +feature.properties["perimetre"]+' m²'+
+           +feature.properties["perimetre"]+' m'+
           '</p>'
           )
           .addTo(map);
@@ -378,6 +383,25 @@ function buildLocationList(data, map) {
   }
 };
 
+// Filter 
+
+var filterEl = document.getElementById('feature-filter');
+  filterEl.addEventListener('keyup', function(e) {
+    var value = normalize(e.target.value);
+    
+    // Filter visible features that don't match the input value.
+    var filtered = sites.features.filter(function(sites) {
+      var name = normalize(sites.properties.nom_site);
+      var code = normalize(feature.properties.num_chant);
+      return name.indexOf(value) > -1 || code.indexOf(value) > -1;
+    });
+    
+    // Populate the sidebar with filtered results
+    buildLocationList(filtered, map);
+    
+  });
+
+
 function flyToStore(currentFeature) {
   map.flyTo({
     center: currentFeature.geometry.coordinates,
@@ -409,20 +433,20 @@ function createPopUp(currentFeature) {
 		'<span class="badge badge-primary badge-pill">'+getLengthLine(currentFeature.properties.num_chant)+' m</span>'+
         '</li>'+
         '<li class="list-group-item d-flex justify-content-between align-items-center">'+
-		'Surface totale Bassins et lagunes'+
+		'Surface totale bassins et lagunes'+
 		'<span class="badge badge-primary badge-pill">'+getSurfaceTypePolygon(currentFeature.properties.num_chant, "Bassins et lagunes")+' m²</span>'+
         '</li>'+
         '<li class="list-group-item d-flex justify-content-between align-items-center">'+
-		    'Surface totale Strate Arborée'+
-		'<span class="badge badge-primary badge-pill">'+getSurfaceTypePolygon(currentFeature.properties.num_chant, "Strate Arborée")+' m²</span>'+
+		    'Surface totale strates arborées'+
+		'<span class="badge badge-primary badge-pill">'+getSurfaceTypePolygon(currentFeature.properties.num_chant, "Strates arborées")+' m²</span>'+
         '</li>'+
         '<li class="list-group-item d-flex justify-content-between align-items-center">'+
-		'Surface totale Strate herbacés'+
-		'<span class="badge badge-primary badge-pill">'+getSurfaceTypePolygon(currentFeature.properties.num_chant, "Strate herbacés")+' m²</span>'+
+		'Surface totale strates herbacées'+
+		'<span class="badge badge-primary badge-pill">'+getSurfaceTypePolygon(currentFeature.properties.num_chant, "Strates herbacées")+' m²</span>'+
         '</li>'+
         '<li class="list-group-item d-flex justify-content-between align-items-center">'+
-		    'Surface totale Surface perméables'+
-		'<span class="badge badge-primary badge-pill">'+getSurfaceTypePolygon(currentFeature.properties.num_chant, "Surface perméables")+' m²</span>'+
+		    'Surface totale surfaces perméables'+
+		'<span class="badge badge-primary badge-pill">'+getSurfaceTypePolygon(currentFeature.properties.num_chant, "Surfaces perméables")+' m²</span>'+
 	    '</li>'+
 	  '</ul>'+
     '</div>'
@@ -443,8 +467,10 @@ function getSurfaceTypePolygon(idSite, type) {
   var sum = 0;
 
 	for(isite = 0; isite< polygon.features.length; isite++){
-	 	if(polygon.features[isite].properties["num_chant"] == idSite && polygon.features[isite].properties["type_esp_v"] == type){
-      sum += parseFloat(polygon.features[isite].properties["aire"]);
+	 	if(polygon.features[isite].properties["num_chant"] == idSite) {
+       if(polygon.features[isite].properties["type_esp_v"] == type){
+        sum += parseFloat(polygon.features[isite].properties["aire"]);
+       }
 	 	}
   };
   return sum.toFixed();
@@ -469,6 +495,11 @@ function getLengthLine(idSite) {
   };
   return sum.toFixed();
 }
+
+function normalize(string) {
+  return string.trim().toLowerCase();
+}
+
 
 </script>
 
@@ -707,6 +738,20 @@ a:hover {
 
 .mapboxgl-popup-anchor-top > .mapboxgl-popup-tip {
   border-bottom-color: #91c949;
+}
+
+.map-overlay fieldset {
+padding-top: 10px;
+margin: 0;
+}
+ 
+.map-overlay input {
+width: 100%;
+padding: 10px;
+margin: 0;
+border: 0;
+border-bottom: 1px solid #eee;
+
 }
 
 </style>
