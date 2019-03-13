@@ -397,8 +397,8 @@ filterEl.addEventListener('keyup', function(e) {
   var value = normalize(e.target.value);
     
   // Filter visible features that don't match the input value.
-  var filtered = sites.features.filter(function(sites) {
-    var name = normalize(sites.properties.nom_site);
+  var filtered = sites.features.filter(function(feature) {
+    var name = normalize(feature.properties.nom_site);
     var code = normalize(feature.properties.num_chant);
     return name.indexOf(value) > -1 || code.indexOf(value) > -1;
   });
@@ -439,18 +439,18 @@ function createPopUp(currentFeature) {
           currentFeature.properties.activite+
         '</li>'+
         '<li>'+
-          '<span>Region: </span>'+
+          '<span>Région: </span>'+
           currentFeature.properties.code_reg+' - '+ currentFeature.properties.region+
         '</li>'+
         '<li>'+
-          '<span>Insée: </span>'+
+          '<span>Code commune INSEE: </span>'+
           currentFeature.properties.insee+
         '</li>'+
         '<li>'+
-          '<span>Adresse: </span><br>'+
+          '<span>Adresse: </span><br> Rue '+
           currentFeature.properties.adresse+','+
-          '<br>'+currentFeature.properties.commune+'</span>'+
-          ', cp: '+currentFeature.properties.postal+
+          '<br>'+currentFeature.properties.postal+'</span>'+
+          ' '+currentFeature.properties.commune+
         '</li>'+
 	  '</ul>'+
 	  '<ul class="list-group">'+
