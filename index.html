@@ -424,8 +424,35 @@ function createPopUp(currentFeature) {
   var popup = new mapboxgl.Popup({ closeOnClick: true })
     .setLngLat(currentFeature.geometry.coordinates)
     .setHTML('<div>'+
-    '<h5>'+ currentFeature.properties.nom_site + '</h5>' +
-	  '<img src="img/'+currentFeature.properties.id+'.PNG" class="rounded float-left" alt="..." width="50%">'+
+    '<h5>'+currentFeature.properties.num_chant+' - '+ currentFeature.properties.nom_site + '</h5>' +
+    '<ul class="sites-info float-left">'+
+	      '<li>'+
+          '<span>Agence: </span>'+
+          currentFeature.properties.code_ag+' - '+ currentFeature.properties.agence+
+	      '</li>'+
+        '<li>'+
+          '<span>Filiale: </span>'+
+          currentFeature.properties.filiale+
+        '</li>'+
+        '<li>'+
+          '<span>Activité: </span>'+
+          currentFeature.properties.activite+
+        '</li>'+
+        '<li>'+
+          '<span>Region: </span>'+
+          currentFeature.properties.code_reg+' - '+ currentFeature.properties.region+
+        '</li>'+
+        '<li>'+
+          '<span>Insée: </span>'+
+          currentFeature.properties.insee+
+        '</li>'+
+        '<li>'+
+          '<span>Adresse: </span><br>'+
+          currentFeature.properties.adresse+','+
+          '<br>'+currentFeature.properties.commune+'</span>'+
+          ', cp: '+currentFeature.properties.postal+
+        '</li>'+
+	  '</ul>'+
 	  '<ul class="list-group">'+
 	    '<li class="list-group-item d-flex justify-content-between align-items-center">'+
 		'Surface'+
@@ -723,6 +750,7 @@ a:hover {
   font-weight: 600;
   margin-top: 5px;
   font-size: 13px;
+  width: 50%
 
 }
 
@@ -758,7 +786,23 @@ padding: 10px;
 margin: 0;
 border: 0;
 border-bottom: 1px solid #eee;
+}
 
+.sites-info li {
+		margin: 0;
+		background: #fff;
+		color: #4a4d4b;
+		font-weight: 600;
+		margin-top: 15px;
+		font-size: 13px;
+		padding-left: 15px
+		
+	}
+
+.sites-info li span {
+  font-size: 13px;
+  font-weight: 600;
+  color: #00853e;
 }
 
 </style>
