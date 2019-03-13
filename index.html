@@ -393,20 +393,20 @@ function buildLocationList(data, map) {
 // Filter 
 
 var filterEl = document.getElementById('feature-filter');
-  filterEl.addEventListener('keyup', function(e) {
-    var value = normalize(e.target.value);
+filterEl.addEventListener('keyup', function(e) {
+  var value = normalize(e.target.value);
     
-    // Filter visible features that don't match the input value.
-    var filtered = sites.features.filter(function(sites) {
-      var name = normalize(sites.properties.nom_site);
-      var code = normalize(feature.properties.num_chant);
-      return name.indexOf(value) > -1 || code.indexOf(value) > -1;
-    });
+  // Filter visible features that don't match the input value.
+  var filtered = sites.features.filter(function(sites) {
+    var name = normalize(sites.properties.nom_site);
+    var code = normalize(feature.properties.num_chant);
+    return name.indexOf(value) > -1 || code.indexOf(value) > -1;
+  });
     
     // Populate the sidebar with filtered results
     buildLocationList(filtered, map);
     
-  });
+});
 
 
 function flyToStore(currentFeature) {
@@ -455,32 +455,44 @@ function createPopUp(currentFeature) {
 	  '</ul>'+
 	  '<ul class="list-group">'+
 	    '<li class="list-group-item d-flex justify-content-between align-items-center">'+
-		'Surface'+
+		    'Surface'+
         '<span class="badge badge-primary badge-pill">'+getSurfaceEmprice(currentFeature.properties.num_chant)+' m²</span>'+
 	    '</li>'+
 	    '<li class="list-group-item d-flex justify-content-between align-items-center">'+
         'Nombre d'+'\''+' arbre isolés'+
-	    '<span class="badge badge-primary badge-pill">'+getNombrePoint(currentFeature.properties.num_chant)+'</span>'+
+	      '<span class="badge badge-primary badge-pill">'+getNombrePoint(currentFeature.properties.num_chant)+'</span>'+
         '</li>'+
 	    '<li class="list-group-item d-flex justify-content-between align-items-center">'+
-		'Longueur de haies'+
-		'<span class="badge badge-primary badge-pill">'+getLengthLine(currentFeature.properties.num_chant)+' m</span>'+
-        '</li>'+
-        '<li class="list-group-item d-flex justify-content-between align-items-center">'+
-		'Surface totale bassins et lagunes'+
-		'<span class="badge badge-primary badge-pill">'+getSurfaceTypePolygon(currentFeature.properties.num_chant, "Bassins et lagunes")+' m²</span>'+
-        '</li>'+
-        '<li class="list-group-item d-flex justify-content-between align-items-center">'+
+		    'Longueur de haies'+
+		    '<span class="badge badge-primary badge-pill">'+getLengthLine(currentFeature.properties.num_chant)+' m</span>'+
+      '</li>'+
+      '<li class="list-group-item d-flex justify-content-between align-items-center">'+
+        'Surface totale strates herbacées'+
+        '<span class="badge badge-primary badge-pill">'+getSurfaceTypePolygon(currentFeature.properties.num_chant, "Strates herbacées")+' m²</span>'+
+      '</li>'+
+      '<li class="list-group-item d-flex justify-content-between align-items-center">'+
+		    'Surface totale strates arbustives'+
+		    '<span class="badge badge-primary badge-pill">'+getSurfaceTypePolygon(currentFeature.properties.num_chant, "Strates arbustives")+' m²</span>'+
+      '</li>'+
+      '<li class="list-group-item d-flex justify-content-between align-items-center">'+
 		    'Surface totale strates arborées'+
-		'<span class="badge badge-primary badge-pill">'+getSurfaceTypePolygon(currentFeature.properties.num_chant, "Strates arborées")+' m²</span>'+
-        '</li>'+
-        '<li class="list-group-item d-flex justify-content-between align-items-center">'+
-		'Surface totale strates herbacées'+
-		'<span class="badge badge-primary badge-pill">'+getSurfaceTypePolygon(currentFeature.properties.num_chant, "Strates herbacées")+' m²</span>'+
-        '</li>'+
-        '<li class="list-group-item d-flex justify-content-between align-items-center">'+
+		    '<span class="badge badge-primary badge-pill">'+getSurfaceTypePolygon(currentFeature.properties.num_chant, "Strates arborées")+' m²</span>'+
+      '</li>'+
+      '<li class="list-group-item d-flex justify-content-between align-items-center">'+
+		    'Surface totale bassins et lagunes'+
+		    '<span class="badge badge-primary badge-pill">'+getSurfaceTypePolygon(currentFeature.properties.num_chant, "Bassins et lagunes")+' m²</span>'+
+      '</li>'+
+      '<li class="list-group-item d-flex justify-content-between align-items-center">'+
+		    'Surface totale surfaces imperméables'+
+		    '<span class="badge badge-primary badge-pill">'+getSurfaceTypePolygon(currentFeature.properties.num_chant, "Surfaces imperméables")+' m²</span>'+
+      '</li>'+
+      '<li class="list-group-item d-flex justify-content-between align-items-center">'+
 		    'Surface totale surfaces perméables'+
-		'<span class="badge badge-primary badge-pill">'+getSurfaceTypePolygon(currentFeature.properties.num_chant, "Surfaces perméables")+' m²</span>'+
+		    '<span class="badge badge-primary badge-pill">'+getSurfaceTypePolygon(currentFeature.properties.num_chant, "Surfaces perméables")+' m²</span>'+
+	    '</li>'+
+      '<li class="list-group-item d-flex justify-content-between align-items-center">'+
+		    'Surface totale terrasse et toits'+
+		    '<span class="badge badge-primary badge-pill">'+getSurfaceTypePolygon(currentFeature.properties.num_chant, "Terrasse et toits")+' m²</span>'+
 	    '</li>'+
 	  '</ul>'+
     '</div>'
