@@ -9,7 +9,10 @@
     <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
     <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.51.0/mapbox-gl.js'></script>
     <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.51.0/mapbox-gl.css' rel='stylesheet' />
-    <script language="JavaScript"  src="https://ajax.aspnetcdn.com/ajax/jquery/jquery-1.9.0.js"></script>
+    <script language="JavaScript"  src="https://ajax.aspnetcdn.com/ajax/jquery/jquery-1.12.4.min.js"></script>
+    <script language="JavaScript"  src="https://ajax.aspnetcdn.com/ajax/jquery/jquery-1.12.4.js"></script>
+    <script src='https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js'></script>
+    <script src='https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap.min.js'></script>
     </script>
     <style>
         body { margin:0; padding:0; }
@@ -42,8 +45,14 @@
     <fieldset>
       <input id='feature-filter' type='text' placeholder='Recherche par numéro de chantier' />
     </fieldset>
-    <div id="accordion" class="listings">
-    </div>
+    <table id="table-sites" class="listings" style="width:100%">
+      <thead>
+        <tr>
+            <th></th>
+        </tr>
+      </thead>
+      <tbody id="accordion" style="width:100%"></tbody>
+    </table>
   </div>
 </div>
 
@@ -264,6 +273,20 @@ map.on("load", function(e) {
                 .addTo(map);
         });
      }
+    $(document).ready(function() {
+      $('#table-sites').DataTable({
+          scrollX:        true,
+          scrollCollapse: true,
+          paging:         false,
+          info:           false
+      }
+      );
+    } );
+    $(document).ready(function () {
+                //$('.dataTables_filter').addClass('col-sm-12');
+        $('.dataTables_filter label').addClass('form-group col-sm-12');
+        $('.dataTables_filter label input').attr('style', 'width: 50%');
+    });
 //end map.on (load)
 })
 
@@ -285,8 +308,10 @@ function buildLocationList(data, map) {
     var prop = currentFeature.properties;
     // Select the listing container in the HTML and append a div
     // with the class 'item' for each store
-    var listings = document.getElementById('accordion');
-    var listing = listings.appendChild(document.createElement('div'));
+    var tbody = document.getElementById('accordion');
+    var listings = tbody.appendChild(document.createElement('tr'));
+    listings.className = 'item-site'
+    var listing = listings.appendChild(document.createElement('td'));
     listing.className = 'item';
     listing.id = 'listing-' + i;
 
@@ -546,7 +571,6 @@ function normalize(string) {
   return string.trim().toLowerCase();
 }
 
-
 </script>
 
 <style>
@@ -618,6 +642,11 @@ a:hover {
   border-bottom: 1px solid #eee;
   padding: 5px 5px 5px 10px;
   text-decoration: none;
+}
+
+.item-site {
+  border-bottom: 1px solid #eee;
+  width: 100%
 }
 
 .listings .item:last-child { border-bottom: none; }
@@ -818,7 +847,7 @@ border-bottom: 1px solid #eee;
 }
 
 </style>
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 </body>
