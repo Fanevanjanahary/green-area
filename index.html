@@ -42,13 +42,11 @@
     <h1>Tarvel - Projet SIG WEB</h1>
   </div>
   <div class='map-overlay'>
-    <fieldset>
-      <input id='feature-filter' type='text' placeholder='Recherche par numéro de chantier' />
-    </fieldset>
     <table id="table-sites" class="listings" style="width:100%">
       <thead>
         <tr>
-            <th></th>
+            <th>
+            </th>
         </tr>
       </thead>
       <tbody id="accordion" style="width:100%"></tbody>
@@ -278,14 +276,23 @@ map.on("load", function(e) {
           scrollX:        true,
           scrollCollapse: true,
           paging:         false,
-          info:           false
+          info:           false,
+          language: { search: "" },
       }
       );
     } );
     $(document).ready(function () {
-                //$('.dataTables_filter').addClass('col-sm-12');
-        $('.dataTables_filter label').addClass('form-group col-sm-12');
-        $('.dataTables_filter label input').attr('style', 'width: 50%');
+
+        $('.dataTables_filter label input').attr('style', 'width: 100%; padding: 10px; margin: 0; border: 0; border-bottom: 1px solid #eee;');
+        $('.dataTables_filter label input').attr('placeholder', 'Recherche par numéro ou nom de chantier')
+        $('.row' ).attr('style', 'width: 100%; margin-right: 0')
+        $('.col-sm-12').attr('style', 'padding-right: 0')
+        var row1 = document.getElementsByClassName("row")[0]
+        row1.getElementsByClassName("col-sm-6")[0].remove()
+        row1.getElementsByTagName("div")[0].setAttribute("class", "feature-filter");
+        var divfilter = document.getElementById('table-sites_filter');
+        divfilter.getElementsByTagName("label")
+        document.getElementsByClassName("row")[2].remove();
     });
 //end map.on (load)
 })
@@ -415,25 +422,6 @@ function buildLocationList(data, map) {
   }
 };
 
-// Filter 
-
-var filterEl = document.getElementById('feature-filter');
-filterEl.addEventListener('keyup', function(e) {
-  var value = normalize(e.target.value);
-    
-  // Filter visible features that don't match the input value.
-  var filtered = sites.features.filter(function(feature) {
-    var name = normalize(feature.properties.nom_site);
-    var code = normalize(feature.properties.num_chant);
-    return name.indexOf(value) > -1 || code.indexOf(value) > -1;
-  });
-    
-    // Populate the sidebar with filtered results
-    buildLocationList(filtered, map);
-    
-});
-
-
 function flyToStore(currentFeature) {
   map.flyTo({
     center: currentFeature.geometry.coordinates,
@@ -484,7 +472,7 @@ function createPopUp(currentFeature) {
         '<span class="badge badge-primary badge-pill">'+getSurfaceEmprice(currentFeature.properties.num_chant)+' m²</span>'+
 	    '</li>'+
 	    '<li class="list-group-item d-flex justify-content-between align-items-center">'+
-        'Nombre d'+'\''+' arbre isolés'+
+        'Nombre d'+'\''+' arbres isolés'+
 	      '<span class="badge badge-primary badge-pill">'+getNombrePoint(currentFeature.properties.num_chant)+'</span>'+
         '</li>'+
 	    '<li class="list-group-item d-flex justify-content-between align-items-center">'+
@@ -816,18 +804,13 @@ a:hover {
   border-bottom-color: #91c949;
 }
 
-.map-overlay fieldset {
-padding-top: 10px;
-margin: 0;
-}
- 
-.map-overlay input {
+.feature-filter {
 width: 100%;
-padding: 10px;
+padding-top: 10px;
+padding-left: 15px;
 margin: 0;
-border: 0;
-border-bottom: 1px solid #eee;
 }
+
 
 .sites-info li {
 		margin: 0;
